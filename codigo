@@ -1,0 +1,94 @@
+class Cliente: #Definimos la clase Cliente.
+    def __init__(self): # Hacemos el constructor de la clase. Utilizamos self para hacer referencia al objeto actual que se está creando.
+        self.nombre=input('Ingrese el nombre del cliente: ') #Aquí, usamos la función input() para obtener el nombre del cliente y lo almacenamos en el atributo "nombre" del objeto.
+        self.email=input('Ingrese el correo electrónico del cliente: ') #De manera similar, obtenemos el correo electrónico del cliente y lo almacenamos en el atributo "email" del objeto.
+        self.telefono=input('Ingrese el número de teléfono del cliente: ') #También obtenemos el número de teléfono del cliente y lo almacenamos en el atributo "telefono" del objeto.
+
+    def mostrar_informacion(self): #Creamos el método de la clase Cliente que nos permite mostrar la información del cliente y utilizamos self para acceder a los atributos del objeto.
+        print('Información del cliente:') #Imprimimos una etiqueta para identificar la información del cliente.
+        print('Nombre: ', self.nombre) #Imprimimos el nombre del cliente que fue ingresado y almacenado previamente en el atributo "nombre".
+        print('Email: ', self.email) #Imprimimos el nombre del cliente que fue ingresado y almacenado previamente en el atributo "nombre".
+        print('Teléfono: ', self.telefono) #Imprimimos el número de teléfono del cliente almacenado en el atributo "telefono".
+
+class Producto:
+    #Si quisiseramos introducir nosotros mismos los datos tendriamos que hacer lo siguiente
+    #def __init__(self):
+        #self.nombre=input('Ingrese el nombre del producto: ')
+        #self.precio=float(input('Ingrese el precio del producto: ')) #Utilizamos el float para convertir la entrada en un número decimal (número de punto flotante) para que pueda manejar valores con decimales, como los precios en este caso.
+        #self.stock=int(input('Ingrese la cantidad en stock: ')) #Usamos el int para obtener la cantidad en stock ya que convierte la entrada en un número entero.
+    #Lo haremos de la siguiente manera
+    def __init__(self, nombre, precio, stock):
+        self.nombre=nombre
+        self.precio=precio
+        self.stock=stock
+
+    def mostrar_informacion(self):
+        print('Información del producto:')
+        print('Nombre: ', self.nombre)
+        print('Precio: $', self.precio)
+        print('Stock: ', self.stock)
+
+    # Crear una lista de productos
+productos_disponibles=[
+    Producto('camiseta', 10.0, 100),
+    Producto('gorra', 8.0, 50),
+    Producto('calcetines', 5.0, 100),
+    Producto('abrigo', 80.0, 50),
+    Producto('zapatillas', 60.0, 100),
+    Producto('pantalones', 20.0, 50),
+    Producto('sudadera', 30.0, 75)
+]
+
+class Carrito:
+    def __init__(self):
+        self.productos_seleccionados=[] #Creamos una lista vacía como un atributo de la clase que almacenará los productos seleccionados en el carrito.
+    def agregar_producto(self, producto, cantidad):
+        if cantidad<=producto.stock:
+            self.productos_seleccionados.append((producto, cantidad))  #El método .append permite agregar un producto a la lista productos_seleccionados.
+            producto.stock-=cantidad
+        else:
+            print(f'No hay suficiente stock de {producto.nombre}.')
+
+    def ver_carrito(self):
+        total=0 #Inicializamos una variable llamada "total" con el valor 0.
+        print('Productos en el carrito:')
+        for producto, cantidad in self.productos_seleccionados: #Hacemos un bucle utilizando el for, que recorre la lista de productos seleccionados del cliente.
+            print(f'Nombre: {producto.nombre}, Precio: ${producto.precio}, Cantidad: {cantidad}')  #Utilizamos la f-string para formatear la salida con el nombre y el precio del producto.
+            total += producto.precio * cantidad #Sumamos el precio del producto actual al valor acumulado en la variable "total", esto se hace para calcular el total de todos los productos seleccionados.
+        print(f'Total: ${total}')
+        return total #Devuelve el valor total como resultado de la función.
+
+    def comprar(self, cliente):
+        total=self.ver_carrito()
+        confirmacion=input('¿Desea confirmar la compra? (Si/No): ') #Pedimos al usuario que confirme si desea realizar la compra y almacenamos la respuesta en la variable confirmacion.
+        if confirmacion.lower()=='si': #Utilizamos un bloque if, que verifica si la respuesta del usuario es si, con una funcion llamada .lower(), esto hace que la comparación no sea sensible a mayúsculas y minúsculas.
+            print(f'Compra realizada correctamente. La factura se ha enviado a {cliente.email} y le hemos enviado un codigo de seguimiento')
+        else: #Utilizamos el bloque else que se ejecuta si la respuesta del usuario no es si.
+            print('La compra ha sido cancelada.')
+
+#Crear un cliente
+cliente1=Cliente() #Instanciamos, esto invoca el constructor __init__ de la clase Cliente.
+cliente1.mostrar_informacion() #Llamamos al método mostrar_informacion en la instancia cliente1 para mostrar la información del cliente que se ingresó al crear la instancia.
+carrito=Carrito() #Instanciamos, esto invoca el constructor __init__ de la clase Carrito.
+
+while True: #Utilizamos el while para hacer un bucle infinito que continuará ejecutándose hasta que se alcance una condición de salida.
+    opcion = input('¿Desea agregar un producto al carrito? (Si/No): ')
+    if opcion.lower() == 'si':
+        print('Productos disponibles:')
+        for i, producto in enumerate(productos_disponibles):
+            print(f'{i + 1}. {producto.nombre} - Precio: ${producto.precio} - Stock: {producto.stock}')
+        try:
+            seleccion = int(input('Seleccione el número de producto que desea comprar: ')) - 1
+            if 0 <= seleccion < len(productos_disponibles):
+                cantidad = int(input(f'¿Cuántas unidades de {productos_disponibles[seleccion].nombre} desea comprar? '))
+                carrito.agregar_producto(productos_disponibles[seleccion], cantidad)
+            else:
+                print('Selección no válida.')
+        except ValueError:
+            print('Entrada no válida.')
+    else:
+        break #Utilizamos el break para salir del bucle
+
+#Ver y comprar productos
+carrito.ver_carrito()
+carrito.comprar(cliente1)
